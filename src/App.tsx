@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { LoginForm } from './components/LoginForm'
+import { ScoreView } from './components/ScoreView'
 import { clearToken, getToken, setToken } from './session'
 
 function App() {
@@ -19,14 +20,7 @@ function App() {
     return <LoginForm onLogin={handleLogin} />
   }
 
-  return (
-    <main className="card">
-      <h1>Sesión activa</h1>
-      <button type="button" onClick={handleLogout}>
-        Cerrar sesión
-      </button>
-    </main>
-  )
+  return <ScoreView token={token} onLogout={handleLogout} />
 }
 
 export default App
