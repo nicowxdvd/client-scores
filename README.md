@@ -5,17 +5,16 @@ App React + TypeScript + Vite. Login con email y contraseña y consulta de score
 ## Requisitos
 
 - Node.js 20 o superior
-- API backend corriendo en `http://localhost:3000`
+- API backend [api-scores](https://github.com/nicowxdvd/api-scores) corriendo en `http://localhost:3000`. Sus pasos de instalación están en su README (`npm i`, completar `JWT_SECRET` en `.env`, `npm run start:dev`).
 
 ## Puesta en marcha
 
 ```bash
 npm install
-cp .env.example .env
 npm run dev
 ```
 
-La app queda en `http://localhost:5173`. Para apuntar a otra API, cambia `VITE_API_URL` en `.env`.
+La app queda en `http://localhost:5173`. El backend se busca en `http://localhost:3000` por defecto. Para usar otra URL, copia `.env.example` a `.env` y cambia `VITE_API_URL`.
 
 ## Comandos
 
