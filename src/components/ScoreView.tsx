@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { getScore } from '../api'
+import { ApiError, getScore } from '../api'
+import { useToast } from '../useToast'
 import type { ScoreResponse } from '../types'
 
 interface ScoreViewProps {
@@ -18,6 +19,7 @@ function formatRut(rut: string): string {
 }
 
 export function ScoreView({ token, onLogout }: ScoreViewProps) {
+  const { showToast } = useToast()
   const [rut, setRut] = useState('')
   const [validation, setValidation] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -34,6 +36,18 @@ export function ScoreView({ token, onLogout }: ScoreViewProps) {
     setLoading(true)
     try {
       setResult(await getScore(token, value))
+    } catch (error) {
+      setResult(null)
+      if (!(error instanceof ApiError)) {
+        showToast('error', 'No se pudo conectar con el servidor')
+      } else if (error.status === 401) {
+        showToast('error', 'Sesión vencida. Ingresa nuevamente')
+        onLogout()
+      } else if ([400, 403, 404].includes(error.status)) {
+        showToast('error', `RUT no permitido: ${error.message}`)
+      } else {
+        showToast('error', `Error inesperado (código ${error.status})`)
+      }
     } finally {
       setLoading(false)
     }
