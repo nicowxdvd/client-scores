@@ -1,75 +1,62 @@
-# React + TypeScript + Vite
+# client-scores
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+App React + TypeScript + Vite. Login con email y contraseña y consulta de score por RUT.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20 o superior
+- API backend corriendo en `http://localhost:3000`
 
-## React Compiler
+## Puesta en marcha
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+La app queda en `http://localhost:5173`. Para apuntar a otra API, cambia `VITE_API_URL` en `.env`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Comandos
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Comando           | Qué hace                     |
+| ----------------- | ---------------------------- |
+| `npm run dev`     | Servidor de desarrollo       |
+| `npm run build`   | Chequeo de tipos y build     |
+| `npm run lint`    | ESLint                       |
+| `npm run preview` | Sirve el build de `dist/`    |
 
-```
+## Datos de prueba
+
+Credenciales:
+
+| Email                | Contraseña |
+| -------------------- | ---------- |
+| `admin@pp-scores.cl` | `@dmin`    |
+
+RUT:
+
+| RUT             | Resultado esperado                                  |
+| --------------- | --------------------------------------------------- |
+| `11.111.111-1`  | Score numérico y fecha                              |
+| `111111111`     | Igual que el anterior (RUT sin formato)             |
+| `12.345.678-5`  | Score numérico (dígito verificador válido)          |
+| `12.345.678-9`  | Toast "RUT no permitido" (dígito verificador malo)  |
+| `abc`           | Aviso de validación en el cliente                   |
+| (vacío)         | Aviso de validación, sin request                    |
+
+## Pruebas manuales rápidas
+
+1. Login con credenciales malas: toast "Credenciales inválidas".
+2. Login con `admin@pp-scores.cl` / `@dmin`: aparece la vista de score.
+3. Consulta `11.111.111-1`: muestra RUT formateado, score y fecha.
+4. Borra `client-scores:token` en `sessionStorage` (DevTools > Application) y consulta de nuevo: vuelve al login con "Sesión vencida. Ingresa nuevamente".
+5. Apaga el backend e intenta login o consulta: toast "No se pudo conectar con el servidor".
+6. Reduce el ancho a 360 px: sin scroll horizontal.
+
+## API
+
+| Endpoint                   | Uso                                      |
+| -------------------------- | ---------------------------------------- |
+| `POST /login`              | Body `{ email, password }`, devuelve `{ accessToken }` |
+| `GET /score?rut=<rut>`     | Header `Authorization: Bearer <token>`   |
